@@ -8,6 +8,7 @@ import { HealthCard } from "@/components/dashboard/HealthCard";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { CostTrend } from "@/components/dashboard/CostTrend";
 import { HourDistribution } from "@/components/dashboard/HourDistribution";
+import { KpiSkeleton, ChartSkeleton, HealthCardSkeleton } from "@/components/ui/Skeleton";
 import { Coins, GitCommit, Activity, Heart } from "lucide-react";
 import type { DashboardData } from "@/lib/data/types";
 
@@ -51,7 +52,27 @@ export default function DashboardPage() {
     return (
       <div className="max-w-[1200px] mx-auto px-6 py-8 w-full">
         <h1 className="text-xl font-semibold text-text-primary mb-6">面板</h1>
-        <div className="text-text-muted text-sm">加载中...</div>
+
+        {/* KPI Skeletons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <KpiSkeleton />
+          <KpiSkeleton />
+          <KpiSkeleton />
+          <KpiSkeleton />
+        </div>
+
+        {/* Chart Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <ChartSkeleton height={250} />
+          <ChartSkeleton height={250} />
+          <ChartSkeleton height={250} />
+        </div>
+
+        {/* Health Card Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <HealthCardSkeleton />
+          <HealthCardSkeleton />
+        </div>
       </div>
     );
   }

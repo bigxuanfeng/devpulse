@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import type { DiaryEntry } from "@/stores/diary";
 import { useDiaryStore } from "@/stores/diary";
 import { useTagsStore } from "@/stores/tags";
@@ -36,7 +36,7 @@ function highlightText(text: string, query: string): React.ReactNode {
 
 export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, onClose }: Props) {
   const { updateEntry, removeEntry } = useDiaryStore();
-  const { getAllTags, getAllProjects, addTag, addProject, _hasHydrated } = useTagsStore();
+  const { addTag, addProject } = useTagsStore();
   const [content, setContent] = useState(entry.content);
   const [date, setDate] = useState(entry.date);
   const [title, setTitle] = useState(entry.title ?? "");
@@ -46,27 +46,17 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
   const [mentionInput, setMentionInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [editMentions, setEditMentions] = useState<string[]>(entry.mentions ?? []);
-  const [animating, setAnimating] = useState(false);
   const expandedRef = useRef<HTMLDivElement>(null);
 
-  // Sync when entry changes externally
-  useEffect(() => {
+  // 当开始编辑时，同步最新数据
+  const handleStartEdit = () => {
     setContent(entry.content);
     setDate(entry.date);
     setTitle(entry.title ?? "");
     setTags(entry.tags);
-  }, [entry]);
-
-  // Animate: brief delay then show editor content
-  useEffect(() => {
-    if (isExpanded) {
-      setAnimating(true);
-      const timer = setTimeout(() => setAnimating(false), 50);
-      return () => clearTimeout(timer);
-    } else {
-      setIsEditing(false); // reset editing state when collapsed
-    }
-  }, [isExpanded]);
+    setEditMentions(entry.mentions ?? []);
+    setIsEditing(true);
+  };
 
   const addMention = () => {
     const m = mentionInput.trim();
@@ -85,7 +75,6 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
 
   const handleSave = () => {
     if (!content.trim()) return;
-    // Auto-create new tags/projects
     for (const t of tags) { addTag(t); }
     for (const m of editMentions) { addProject(m); }
     updateEntry(entry.id, { date, title: title.trim(), content: content.trim(), tags, mentions: editMentions });
@@ -152,7 +141,6 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
                 ))}
               </div>
             )}
-            {/* Extra spacer for when there's no content preview */}
             {!entry.content && !mentions.length && !entry.tags.length && <div className="h-1" />}
           </>
         )}
@@ -328,14 +316,7 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
             </button>
           ) : (
             <button
-              onClick={() => {
-                setTitle(entry.title ?? "");
-                setDate(entry.date);
-                setContent(entry.content);
-                setTags(entry.tags);
-                setEditMentions(entry.mentions ?? []);
-                setIsEditing(true);
-              }}
+              onClick={handleStartEdit}
               className="px-4 py-1.5 bg-accent text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-accent-hover"
             >
               编辑

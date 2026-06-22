@@ -39,8 +39,8 @@ export function DiarySidebar({
   const [newProject, setNewProject] = useState("");
   const [manageType, setManageType] = useState<"tags" | "projects" | null>(null);
 
-  const allTags = _hasHydrated ? getAllTags() : [];
-  const allProjects = _hasHydrated ? getAllProjects() : [];
+  const allTags = useMemo(() => _hasHydrated ? getAllTags() : [], [_hasHydrated]);
+  const allProjects = useMemo(() => _hasHydrated ? getAllProjects() : [], [_hasHydrated]);
 
   // Also collect projects from @mentions in entries
   const mentionedProjects = useMemo(() => {

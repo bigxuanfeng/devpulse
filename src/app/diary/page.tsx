@@ -8,6 +8,7 @@ import { DiarySidebar } from "@/components/diary/DiarySidebar";
 import { useTagsStore } from "@/stores/tags";
 import { Plus, BookOpen, Search, X, AtSign, FileText } from "lucide-react";
 import { WeeklyReportModal } from "@/components/diary/WeeklyReportModal";
+import { DiaryCardSkeleton } from "@/components/ui/Skeleton";
 
 export default function DiaryPage() {
   const { entries, activeEntryId, setActiveEntry, setEntries } = useDiaryStore();
@@ -238,7 +239,11 @@ export default function DiaryPage() {
 
         {/* Card Stream */}
         {loading ? (
-          <div className="text-text-muted text-sm">加载中...</div>
+          <div className="space-y-3">
+            <DiaryCardSkeleton />
+            <DiaryCardSkeleton />
+            <DiaryCardSkeleton />
+          </div>
         ) : filteredEntries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-text-muted">
             <BookOpen size={40} className="mb-4 opacity-40" />

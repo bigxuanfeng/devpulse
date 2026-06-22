@@ -10,6 +10,7 @@ import {
   Key,
   FolderGit2,
 } from "lucide-react";
+import { ProjectListSkeleton } from "@/components/ui/Skeleton";
 
 interface Project {
   name: string;
@@ -140,7 +141,7 @@ export default function SettingsPage() {
           {/* Project List */}
           <div className="divide-y divide-border-default">
             {loading ? (
-              <div className="px-4 py-6 text-sm text-text-muted">加载中...</div>
+              <ProjectListSkeleton />
             ) : projects.length === 0 ? (
               <div className="px-4 py-6 text-sm text-text-muted">
                 还没有配置任何项目，在下方添加
