@@ -1,0 +1,19 @@
+{
+  "snapshots": [
+    {
+      "date": "2026-06-19",
+      "totalBalance": 5.2,
+      "toppedUp": 5.2
+    },
+    {
+      "date": "2026-06-20",
+      "totalBalance": 2.43,
+      "toppedUp": 2.43
+    },
+    {
+      "date": "2026-06-22",
+      "totalBalance": 1.83,
+      "toppedUp": 1.83
+    }
+  ]
+}

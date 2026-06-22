@@ -1,26 +1,271 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ===== DevPulse Design Tokens ===== */
+/* All color tokens reference CSS variables that toggle with data-theme */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg-root: var(--tw-bg-root);
+  --color-bg-surface: var(--tw-bg-surface);
+  --color-bg-elevated: var(--tw-bg-elevated);
+  --color-bg-hover: var(--tw-bg-hover);
+
+  --color-text-primary: var(--tw-text-primary);
+  --color-text-secondary: var(--tw-text-secondary);
+  --color-text-muted: var(--tw-text-muted);
+
+  --color-border-default: var(--tw-border-default);
+  --color-border-emphasis: var(--tw-border-emphasis);
+
+  --color-accent: var(--tw-accent);
+  --color-accent-hover: var(--tw-accent-hover);
+  --color-accent-subtle: var(--tw-accent-subtle);
+  --color-accent-text: var(--tw-accent-text);
+
+  --color-success: #6b8c5c;
+  --color-success-subtle: var(--tw-success-subtle);
+  --color-warning: #c49a20;
+  --color-warning-subtle: var(--tw-warning-subtle);
+  --color-error: #b8443a;
+  --color-error-subtle: var(--tw-error-subtle);
+  --color-info: #5a8fa0;
+  --color-info-subtle: var(--tw-info-subtle);
+
+  --color-chart-1: var(--tw-chart-1);
+  --color-chart-2: var(--tw-chart-2);
+  --color-chart-3: var(--tw-chart-3);
+  --color-chart-4: var(--tw-chart-4);
+  --color-chart-5: var(--tw-chart-5);
+  --color-chart-grid: var(--tw-chart-grid);
+  --color-chart-axis: var(--tw-chart-axis);
+  --color-chart-empty: var(--tw-chart-empty);
+
+  --font-ui: system-ui, -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-data: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+  --font-editor: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --shadow-card: var(--tw-shadow-card);
+  --shadow-elevated: var(--tw-shadow-elevated);
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== Dark Theme (default) ===== */
+
+:root {
+  --tw-bg-root: #0a0a0f;
+  --tw-bg-surface: #13131a;
+  --tw-bg-elevated: #1a1a24;
+  --tw-bg-hover: #22222e;
+
+  --tw-text-primary: #ede4d8;
+  --tw-text-secondary: #a09a90;
+  --tw-text-muted: #5c5850;
+
+  --tw-border-default: #1e1e2a;
+  --tw-border-emphasis: #2a2a38;
+
+  --tw-accent-subtle: #3d2a1a;
+  --tw-accent-text: #f5c08a;
+
+  --tw-success-subtle: #1a2a15;
+  --tw-warning-subtle: #2a2215;
+  --tw-error-subtle: #2a1515;
+  --tw-info-subtle: #151f2a;
+
+  --tw-chart-1: #e8954c;
+  --tw-chart-2: #d4a853;
+  --tw-chart-3: #c7826e;
+  --tw-chart-4: #b89a6b;
+  --tw-chart-5: #a0805c;
+  --tw-chart-grid: #1e1e2a;
+  --tw-chart-axis: #5c5850;
+  --tw-chart-empty: #22222e;
+
+  --tw-accent: #e8954c;
+  --tw-accent-hover: #f0a868;
+
+  --tw-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --tw-shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
+/* ===== Light Theme ===== */
+
+[data-theme="light"] {
+  --tw-bg-root: #f5f2ed;
+  --tw-bg-surface: #ffffff;
+  --tw-bg-elevated: #ffffff;
+  --tw-bg-hover: #f0ece6;
+
+  --tw-text-primary: #1a1814;
+  --tw-text-secondary: #5c5850;
+  --tw-text-muted: #9c978a;
+
+  --tw-border-default: #e5e0d8;
+  --tw-border-emphasis: #d5cfc5;
+
+  --tw-accent-subtle: #fdf0e4;
+  --tw-accent-text: #b06520;
+
+  --tw-success-subtle: #e8f0e2;
+  --tw-warning-subtle: #faf3e0;
+  --tw-error-subtle: #fae8e6;
+  --tw-info-subtle: #e2eef2;
+
+  --tw-chart-1: #d08040;
+  --tw-chart-2: #c49a20;
+  --tw-chart-3: #c07050;
+  --tw-chart-4: #a08050;
+  --tw-chart-5: #8a6a40;
+  --tw-chart-grid: #e5e0d8;
+  --tw-chart-axis: #9c978a;
+  --tw-chart-empty: #f0ece6;
+
+  --tw-accent: #d08040;
+  --tw-accent-hover: #c07030;
+
+  --tw-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --tw-shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Base ===== */
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--tw-bg-root);
+  color: var(--tw-text-primary);
+  font-family: var(--font-ui);
+}
+
+/* ===== Scrollbar ===== */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tw-border-emphasis);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tw-text-muted);
+}
+
+/* ===== Selection ===== */
+
+::selection {
+  background-color: var(--tw-accent-subtle);
+  color: var(--tw-accent-text);
+}
+
+/* ===== Milkdown Editor ===== */
+
+.milkdown-editor-wrapper .ProseMirror {
+  min-height: 200px;
+  outline: none;
+  color: var(--tw-text-primary);
+  font-family: var(--font-editor);
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.milkdown-editor-wrapper .ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.milkdown-editor-wrapper .ProseMirror h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--tw-text-primary);
+  margin: 0.8em 0 0.4em;
+}
+
+.milkdown-editor-wrapper .ProseMirror h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--tw-text-primary);
+  margin: 0.6em 0 0.3em;
+}
+
+.milkdown-editor-wrapper .ProseMirror h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--tw-text-primary);
+  margin: 0.5em 0 0.3em;
+}
+
+.milkdown-editor-wrapper .ProseMirror ul,
+.milkdown-editor-wrapper .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+
+.milkdown-editor-wrapper .ProseMirror li {
+  margin: 0.2em 0;
+}
+
+.milkdown-editor-wrapper .ProseMirror code {
+  font-family: var(--font-data);
+  background: var(--tw-bg-hover);
+  border-radius: 4px;
+  padding: 0.15em 0.35em;
+  font-size: 0.875rem;
+}
+
+.milkdown-editor-wrapper .ProseMirror pre {
+  font-family: var(--font-data);
+  background: var(--tw-bg-root);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.8em 0;
+  overflow-x: auto;
+}
+
+.milkdown-editor-wrapper .ProseMirror pre code {
+  background: none;
+  padding: 0;
+}
+
+.milkdown-editor-wrapper .ProseMirror blockquote {
+  border-left: 3px solid var(--tw-border-emphasis);
+  padding-left: 1rem;
+  margin: 0.8em 0;
+  color: var(--tw-text-secondary);
+}
+
+.milkdown-editor-wrapper .ProseMirror a {
+  color: var(--tw-accent);
+  text-decoration: none;
+}
+
+.milkdown-editor-wrapper .ProseMirror a:hover {
+  text-decoration: underline;
+}
+
+.milkdown-editor-wrapper .ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--tw-border-default);
+  margin: 1em 0;
+}
+
+.milkdown-editor-wrapper .ProseMirror .placeholder {
+  color: var(--tw-text-muted);
+  pointer-events: none;
+}
+
+.milkdown-editor-wrapper .ProseMirror:focus {
+  outline: none;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .milkdown-editor-wrapper .ProseMirror pre {
+  background: var(--tw-bg-hover);
 }

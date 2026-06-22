@@ -1,0 +1,20 @@
+{
+  "nav.dashboard": "面板",
+  "nav.diary": "日记",
+  "nav.settings": "设置",
+  "dashboard.title": "面板",
+  "diary.title": "日记",
+  "diary.empty": "写下第一篇日记",
+  "diary.autoSummary": "自动摘要",
+  "diary.addNote": "写点什么...",
+  "diary.save": "保存",
+  "diary.copyReport": "复制为周报",
+  "cost.title": "AI 成本总览",
+  "cost.thisMonth": "本月",
+  "cost.trend": "AI 成本趋势",
+  "activity.title": "代码活动热力图",
+  "activity.empty": "连接 Git 仓库后显示活动数据",
+  "health.title": "项目健康",
+  "health.noActivity": "该仓库最近无提交",
+  "health.addRepo": "添加更多项目仓库 →"
+}
