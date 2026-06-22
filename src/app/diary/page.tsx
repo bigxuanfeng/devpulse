@@ -8,6 +8,7 @@ import { DiarySidebar } from "@/components/diary/DiarySidebar";
 import { useTagsStore } from "@/stores/tags";
 import { Plus, BookOpen, Search, X, AtSign, FileText } from "lucide-react";
 import { WeeklyReportModal } from "@/components/diary/WeeklyReportModal";
+import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 import { DiaryCardSkeleton } from "@/components/ui/Skeleton";
 
 export default function DiaryPage() {
@@ -26,6 +27,23 @@ export default function DiaryPage() {
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  // 快捷键：Ctrl+N 新建日记，Ctrl+/ 聚焦搜索
+  useKeyboardShortcut({
+    key: "n",
+    modifier: "ctrl",
+    callback: () => {
+      setActiveEntry(null);
+      setIsNew(true);
+    },
+  });
+  useKeyboardShortcut({
+    key: "/",
+    modifier: "ctrl",
+    callback: () => {
+      document.querySelector<HTMLInputElement>('input[placeholder*="搜索"]')?.focus();
+    },
+  });
 
   const handleSearch = () => {
     const q = searchInput.trim();

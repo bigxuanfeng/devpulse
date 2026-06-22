@@ -6,6 +6,7 @@ import { useDiaryStore, extractMentions } from "@/stores/diary";
 import { useTagsStore } from "@/stores/tags";
 import { X, Copy, AtSign, Trash2 } from "lucide-react";
 import { MilkdownEditor, type MilkdownEditorRef } from "./MilkdownEditor";
+import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 
 interface DiaryEditorProps {
   entry: DiaryEntry | null;
@@ -54,6 +55,13 @@ export function DiaryEditor({ entry, isNew, onClose }: DiaryEditorProps) {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const editorRef = useRef<MilkdownEditorRef>(null);
   const [, startTransition] = useTransition();
+
+  // 快捷键：Ctrl+S 保存
+  useKeyboardShortcut({
+    key: "s",
+    modifier: "ctrl",
+    callback: () => handleSave(),
+  });
 
   useEffect(() => {
     let cancelled = false;

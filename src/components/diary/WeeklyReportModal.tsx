@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition, useCallback } from "react";
 import { X, Copy, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 
 interface WeeklyReportModalProps {
   onClose: () => void;
@@ -28,6 +29,12 @@ export function WeeklyReportModal({ onClose }: WeeklyReportModalProps) {
   }>(null);
   const [error, setError] = useState("");
   const [, startTransition] = useTransition();
+
+  // 快捷键：Escape 关闭
+  useKeyboardShortcut({
+    key: "Escape",
+    callback: () => onClose(),
+  });
 
   const fetchReport = useCallback(() => {
     startTransition(() => { setLoading(true); setError(""); });
