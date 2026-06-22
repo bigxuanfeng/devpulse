@@ -10,7 +10,7 @@ interface WeeklyReportModalProps {
 
 type ReportMode = "week" | "month";
 
-export function WeeklyReportModal({ onClose }: WeeklyReportModalProps) {
+export default function WeeklyReportModal({ onClose }: WeeklyReportModalProps) {
   const [mode, setMode] = useState<ReportMode>("week");
   const [date, setDate] = useState(() => {
     const d = new Date();

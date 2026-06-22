@@ -42,7 +42,7 @@ function getTodayStr(): string {
   ).padStart(2, "0")}`;
 }
 
-export function DiaryEditor({ entry, isNew, onClose }: DiaryEditorProps) {
+export default function DiaryEditor({ entry, isNew, onClose }: DiaryEditorProps) {
   const { addEntry, updateEntry, removeEntry } = useDiaryStore();
   const { getAllTags, getAllProjects, addTag, addProject } = useTagsStore();
 

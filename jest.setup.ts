@@ -12,15 +12,6 @@ jest.mock("next/navigation", () => ({
   notFound: jest.fn(),
 }));
 
-// Mock Next.js image
-jest.mock("next/image", () => ({
-  __esModule: true,
-  default: (props: any) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} alt={props.alt} />;
-  },
-}));
-
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,

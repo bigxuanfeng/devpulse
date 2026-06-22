@@ -1,15 +1,24 @@
 "use client";
 
 import { useState, useEffect, useMemo, useTransition } from "react";
+import dynamic from "next/dynamic";
 import { useDiaryStore } from "@/stores/diary";
-import { DiaryEditor } from "@/components/diary/DiaryEditor";
 import { ExpandableDiaryCard } from "@/components/diary/ExpandableDiaryCard";
 import { DiarySidebar } from "@/components/diary/DiarySidebar";
 import { useTagsStore } from "@/stores/tags";
 import { Plus, BookOpen, Search, X, AtSign, FileText } from "lucide-react";
-import { WeeklyReportModal } from "@/components/diary/WeeklyReportModal";
 import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 import { DiaryCardSkeleton } from "@/components/ui/Skeleton";
+
+// 懒加载大型组件（使用 Next.js dynamic）
+const DiaryEditor = dynamic(() => import("@/components/diary/DiaryEditor"), {
+  loading: () => <DiaryCardSkeleton />,
+  ssr: false,
+});
+const WeeklyReportModal = dynamic(() => import("@/components/diary/WeeklyReportModal"), {
+  loading: () => <DiaryCardSkeleton />,
+  ssr: false,
+});
 
 export default function DiaryPage() {
   const { entries, activeEntryId, setActiveEntry, setEntries } = useDiaryStore();
