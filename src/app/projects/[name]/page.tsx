@@ -39,10 +39,13 @@ function readDiaryEntries(): DiaryEntry[] {
 
 interface Props {
   params: { name: string };
+  searchParams: { page?: string; limit?: string };
 }
 
-export default async function ProjectPage({ params }: Props) {
+export default async function ProjectPage({ params, searchParams }: Props) {
   const { name } = params;
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const limit = Math.min(100, Math.max(5, Number(searchParams.limit) || 20));
   const projects = getProjects();
   const projectConfig = projects.find((p) => p.name === name);
 
@@ -54,6 +57,15 @@ export default async function ProjectPage({ params }: Props) {
   const entries = readDiaryEntries()
     .filter((e) => e.mentions.includes(name))
     .sort((a, b) => b.date.localeCompare(a.date));
+
+  // 分页计算
+  const allCommits = stats.recentCommits;
+  const totalItems = allCommits.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const startIndex = (safePage - 1) * limit;
+  const endIndex = Math.min(startIndex + limit, totalItems);
+  const currentCommits = allCommits.slice(startIndex, endIndex);
 
   const statusLabel: Record<string, string> = {
     active: "活跃",
@@ -92,32 +104,120 @@ export default async function ProjectPage({ params }: Props) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <SectionTitle icon={<GitCommit size={14} />} title="最近提交" />
+          <SectionTitle icon={<GitCommit size={14} />} title="提交历史" />
           <div className="bg-bg-surface rounded-md border border-border-default overflow-hidden">
-            {stats.recentCommits.length === 0 ? (
+            {totalItems === 0 ? (
               <div className="px-4 py-8 text-center text-text-muted text-sm">无提交记录</div>
             ) : (
-              <ul className="divide-y divide-border-default">
-                {stats.recentCommits.map((c: CommitInfo) => (
-                  <li key={c.hash} className="px-4 py-3 hover:bg-bg-hover transition-colors duration-100">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-[family-name:var(--font-data)] text-text-muted">
-                        {c.date.slice(0, 10)}
-                      </span>
-                      <span className="text-xs font-[family-name:var(--font-data)] text-text-muted">
-                        {c.hash.slice(0, 7)}
-                      </span>
-                    </div>
-                    <div className="text-sm text-text-primary">{c.message}</div>
-                    {(c.additions > 0 || c.deletions > 0) && (
-                      <div className="flex gap-3 mt-1 text-xs font-[family-name:var(--font-data)]">
-                        <span className="text-success">+{c.additions}</span>
-                        <span className="text-error">-{c.deletions}</span>
+              <>
+                <div className="px-4 py-2 text-xs text-text-muted border-b border-border-default">
+                  显示 {startIndex + 1}-{endIndex} 条，共 {totalItems} 条提交
+                </div>
+                <ul className="divide-y divide-border-default">
+                  {currentCommits.map((c: CommitInfo) => (
+                    <li key={c.hash} className="px-4 py-3 hover:bg-bg-hover transition-colors duration-100">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-[family-name:var(--font-data)] text-text-muted">
+                          {c.date.slice(0, 10)}
+                        </span>
+                        <span className="text-xs font-[family-name:var(--font-data)] text-text-muted">
+                          {c.hash.slice(0, 7)}
+                        </span>
                       </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                      <div className="text-sm text-text-primary">{c.message}</div>
+                      {(c.additions > 0 || c.deletions > 0) && (
+                        <div className="flex gap-3 mt-1 text-xs font-[family-name:var(--font-data)]">
+                          <span className="text-success">+{c.additions}</span>
+                          <span className="text-error">-{c.deletions}</span>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between px-4 py-3 border-t border-border-default">
+                    <div className="flex items-center gap-2 text-xs text-text-muted">
+                      <span>每页</span>
+                      {[5, 20, 50].map((l) => (
+                        <a
+                          key={l}
+                          href={`?page=1&limit=${l}`}
+                          className={`px-1.5 py-0.5 rounded ${
+                            limit === l ? "bg-accent text-white" : "hover:text-accent"
+                          }`}
+                        >
+                          {l}
+                        </a>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <a
+                        href={`?page=${Math.max(1, safePage - 1)}&limit=${limit}`}
+                        className={`px-2 py-1 text-xs border border-border-default rounded hover:border-accent transition-colors duration-150 ${
+                          safePage <= 1 ? "opacity-30 pointer-events-none" : ""
+                        }`}
+                      >
+                        上一页
+                      </a>
+
+                      {(() => {
+                        const pages: (number | string)[] = [];
+                        const maxVisible = 5;
+                        
+                        if (totalPages <= maxVisible + 2) {
+                          for (let i = 1; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          pages.push(1);
+                          if (safePage > 3) pages.push("...");
+                          
+                          const start = Math.max(2, safePage - 1);
+                          const end = Math.min(totalPages - 1, safePage + 1);
+                          for (let i = start; i <= end; i++) pages.push(i);
+                          
+                          if (safePage < totalPages - 2) pages.push("...");
+                          pages.push(totalPages);
+                        }
+                        
+                        return pages.map((p, idx) =>
+                          typeof p === "string" ? (
+                            <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-text-muted">
+                              ...
+                            </span>
+                          ) : (
+                            <a
+                              key={p}
+                              href={`?page=${p}&limit=${limit}`}
+                              className={`px-2.5 py-1 text-xs border rounded transition-colors duration-150 ${
+                                safePage === p
+                                  ? "bg-accent text-white border-accent"
+                                  : "border-border-default hover:border-accent"
+                              }`}
+                            >
+                              {p}
+                            </a>
+                          )
+                        );
+                      })()}
+
+                      <a
+                        href={`?page=${Math.min(totalPages, safePage + 1)}&limit=${limit}`}
+                        className={`px-2 py-1 text-xs border border-border-default rounded hover:border-accent transition-colors duration-150 ${
+                          safePage >= totalPages ? "opacity-30 pointer-events-none" : ""
+                        }`}
+                      >
+                        下一页
+                      </a>
+                    </div>
+
+                    <div className="text-xs text-text-muted">
+                      第 {safePage} / {totalPages} 页
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
