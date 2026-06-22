@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { collectAllGitStats, getGlobalActivity } from "@/lib/data/git-collector";
-import { fetchDeepSeekBalance, saveSnapshot, getCostStats } from "@/lib/data/ai-usage";
+import { fetchDeepSeekBalance, getCostStats } from "@/lib/data/ai-usage";
 
 export const dynamic = "force-dynamic";
 
@@ -9,14 +9,18 @@ export async function GET() {
   const gitStats = collectAllGitStats();
   const global = getGlobalActivity();
 
-  // AI usage — fetch current balance and save snapshot
+  // AI usage — 只读取已有数据，不写入文件（避免触发 Turbopack 重新编译 → 无限刷新）
   let aiUsage = null;
   try {
+    // 尝试获取最新余额（仅内存中使用，不保存到文件）
     const balance = await fetchDeepSeekBalance();
-    saveSnapshot(balance);
-    aiUsage = getCostStats();
+    // 注意：不在 GET 请求中调用 saveSnapshot，避免写文件触发 HMR 循环
+    // 快照保存由 /api/ai-balance POST 端点专门处理（设置页手动触发）
+    aiUsage = {
+      ...getCostStats(),
+      currentBalance: balance.totalBalance,
+    };
   } catch (err) {
-    // AI API unavailable — return what we have stored
     console.error("[Dashboard API] Failed to fetch DeepSeek balance:", err);
     aiUsage = getCostStats();
   }
