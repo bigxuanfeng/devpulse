@@ -6,7 +6,8 @@ function isGitRepo(path: string): boolean {
   try {
     execSync("git rev-parse --git-dir", { cwd: path, stdio: "ignore" });
     return true;
-  } catch {
+  } catch (err) {
+    console.error(`[git-collector] Failed to verify git repo at ${path}:`, err);
     return false;
   }
 }
@@ -50,7 +51,8 @@ function getCommitLog(path: string, since?: string): CommitInfo[] {
     if (current?.hash) commits.push(current as CommitInfo);
 
     return commits.reverse(); // oldest first
-  } catch {
+  } catch (err) {
+    console.error(`[git-collector] Failed to get commit log for ${path}:`, err);
     return [];
   }
 }
@@ -66,7 +68,8 @@ function countTodos(path: string): number {
       if (match) total += parseInt(match[1], 10);
     }
     return total;
-  } catch {
+  } catch (err) {
+    console.error(`[git-collector] Failed to count TODOs for ${path}:`, err);
     return 0;
   }
 }
@@ -115,6 +118,37 @@ function getDailyActivity(commits: CommitInfo[]): DailyActivity[] {
   }));
 }
 
+// ── In-memory cache for git stats (avoids re-running git log on every dashboard refresh) ──
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  projectKeys: string; // sorted project paths joined — detects config changes
+}
+
+let statsCache: CacheEntry<GitStats[]> | null = null;
+let activityCache: CacheEntry<{
+  totalCommits: number;
+  activeDays: number;
+  dailyActivity: DailyActivity[];
+}> | null = null;
+
+function getProjectKey(): string {
+  return getProjects()
+    .map((p) => p.path)
+    .sort()
+    .join("|");
+}
+
+function isCacheValid<T>(cache: CacheEntry<T> | null, projectKey: string): boolean {
+  if (!cache) return false;
+  if (Date.now() - cache.timestamp > CACHE_TTL) return false;
+  if (cache.projectKeys !== projectKey) return false;
+  return true;
+}
+
 export function collectGitStats(projectPath: string, projectName: string): GitStats | null {
   if (!isGitRepo(projectPath)) return null;
 
@@ -140,10 +174,19 @@ export function collectGitStats(projectPath: string, projectName: string): GitSt
 }
 
 export function collectAllGitStats(): GitStats[] {
+  const projectKey = getProjectKey();
+
+  if (isCacheValid(statsCache, projectKey)) {
+    return statsCache!.data;
+  }
+
   const projects = getProjects();
-  return projects.map((p) => collectGitStats(p.path, p.name)).filter(
+  const data = projects.map((p) => collectGitStats(p.path, p.name)).filter(
     (s): s is GitStats => s !== null
   );
+
+  statsCache = { data, timestamp: Date.now(), projectKeys: projectKey };
+  return data;
 }
 
 export function getGlobalActivity(): {
@@ -151,6 +194,12 @@ export function getGlobalActivity(): {
   activeDays: number;
   dailyActivity: DailyActivity[];
 } {
+  const projectKey = getProjectKey();
+
+  if (isCacheValid(activityCache, projectKey)) {
+    return activityCache!.data;
+  }
+
   const projects = getProjects();
   const allCommits: CommitInfo[] = [];
   for (const p of projects) {
@@ -162,11 +211,20 @@ export function getGlobalActivity(): {
   const dailyActivity = getDailyActivity(allCommits);
   const uniqueDays = new Set(dailyActivity.map((d) => d.date));
 
-  return {
+  const data = {
     totalCommits: allCommits.length,
     activeDays: uniqueDays.size,
     dailyActivity,
   };
+
+  activityCache = { data, timestamp: Date.now(), projectKeys: projectKey };
+  return data;
+}
+
+/** Invalidate all caches — call after project config changes */
+export function invalidateGitCache(): void {
+  statsCache = null;
+  activityCache = null;
 }
 
 /**

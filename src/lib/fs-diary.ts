@@ -11,8 +11,12 @@ export async function pickDirectory(): Promise<FileSystemDirectoryHandle | null>
     const handle = await window.showDirectoryPicker({ mode: "readwrite" });
     localStorage.setItem(DIR_HANDLE_KEY, "1"); // mark as picked
     return handle;
-  } catch {
-    return null; // user cancelled
+  } catch (err) {
+    // User cancelled directory picker or permission denied — not an error
+    if ((err as Error)?.name !== "AbortError") {
+      console.error("[fs-diary] Failed to pick directory:", err);
+    }
+    return null;
   }
 }
 
@@ -68,7 +72,8 @@ function deserializeEntry(fileName: string, content: string): DiaryEntry | null 
       createdAt: frontmatter.createdAt,
       updatedAt: frontmatter.updatedAt,
     };
-  } catch {
+  } catch (err) {
+    console.error("[fs-diary] Failed to deserialize entry from file", fileName, ":", err);
     return null;
   }
 }
@@ -107,7 +112,8 @@ export async function readAllEntries(
       const content = await file.text();
       const entry = deserializeEntry(name, content);
       if (entry) entries.push(entry);
-    } catch {
+    } catch (err) {
+      console.error("[fs-diary] Failed to read diary file", name, ":", err);
       // skip corrupted files
     }
   }

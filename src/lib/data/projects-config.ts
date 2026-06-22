@@ -28,7 +28,8 @@ function readConfig(): ProjectsData {
       return initial;
     }
     return JSON.parse(fs.readFileSync(CONFIG_FILE, "utf-8"));
-  } catch {
+  } catch (err) {
+    console.error("[projects-config] Failed to read config file:", err);
     return { projects: [] };
   }
 }

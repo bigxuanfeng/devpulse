@@ -32,7 +32,8 @@ function readDiaryEntries(): DiaryEntry[] {
     if (!fs.existsSync(filePath)) return [];
     const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     return data.entries ?? [];
-  } catch {
+  } catch (err) {
+    console.error("[ProjectPage] Failed to read diary entries:", err);
     return [];
   }
 }

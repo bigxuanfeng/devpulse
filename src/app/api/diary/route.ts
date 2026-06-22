@@ -50,7 +50,8 @@ function deserialize(name: string, raw: string): DiaryEntry | null {
       createdAt: fm.createdAt || new Date().toISOString(),
       updatedAt: fm.updatedAt || new Date().toISOString(),
     };
-  } catch {
+  } catch (err) {
+    console.error("[diary API] Failed to deserialize entry from file", name, ":", err);
     return null;
   }
 }

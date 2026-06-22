@@ -39,7 +39,8 @@ export default function DashboardPage() {
           global: json.global,
         });
         setSummary(json.summary);
-      } catch {
+      } catch (err) {
+        console.error("[Dashboard] Failed to fetch dashboard data:", err);
         setError(true);
       } finally {
         setLoading(false);

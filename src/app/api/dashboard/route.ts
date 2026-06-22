@@ -15,8 +15,9 @@ export async function GET() {
     const balance = await fetchDeepSeekBalance();
     saveSnapshot(balance);
     aiUsage = getCostStats();
-  } catch {
+  } catch (err) {
     // AI API unavailable — return what we have stored
+    console.error("[Dashboard API] Failed to fetch DeepSeek balance:", err);
     aiUsage = getCostStats();
   }
 

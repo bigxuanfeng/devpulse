@@ -4,6 +4,12 @@ import { useEffect } from 'react';
 
 export function SWRegistration() {
   useEffect(() => {
+    // 只在生产环境注册 Service Worker
+    // 开发环境下 SW 会拦截 HMR 请求，导致页面无限刷新
+    if (process.env.NODE_ENV !== 'production') {
+      return;
+    }
+
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return;
     }
@@ -19,7 +25,6 @@ export function SWRegistration() {
         });
     };
 
-    // 如果页面已经加载完成，立即注册；否则等待加载完成
     if (document.readyState === 'complete') {
       registerSW();
     } else {

@@ -13,7 +13,8 @@ function readDiaryData(): StoredData {
     const filePath = path.join(process.cwd(), "data", "diary.json");
     if (!fs.existsSync(filePath)) return { entries: [] };
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  } catch {
+  } catch (err) {
+    console.error("[weekly-report API] Failed to read diary data:", err);
     return { entries: [] };
   }
 }

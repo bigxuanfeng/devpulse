@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# runtime data — excluded from Turbopack watching to prevent HMR loops
+/data/
+
 # production
 /build
 

@@ -29,8 +29,8 @@ async function saveEntry(entry: DiaryEntry) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(entry),
     });
-  } catch {
-    // ignore
+  } catch (err) {
+    console.error("[diary-store] Failed to save entry to server:", err);
   }
 }
 
@@ -41,8 +41,8 @@ async function deleteEntryOnServer(id: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
-  } catch {
-    // ignore
+  } catch (err) {
+    console.error("[diary-store] Failed to delete entry from server:", err);
   }
 }
 

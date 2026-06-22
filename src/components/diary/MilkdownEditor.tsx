@@ -61,7 +61,8 @@ function MilkdownInner({
         const doc = ctx.get(editorStateCtx).doc;
         return serializer(doc);
       });
-    } catch {
+    } catch (err) {
+      console.error("[MilkdownEditor] Failed to serialize editor content:", err);
       return value;
     }
   }, [get, value]);

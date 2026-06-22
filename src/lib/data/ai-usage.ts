@@ -20,7 +20,8 @@ function readStorage(): StoredData {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     if (!fs.existsSync(STORAGE_FILE)) return { snapshots: [] };
     return JSON.parse(fs.readFileSync(STORAGE_FILE, "utf-8"));
-  } catch {
+  } catch (err) {
+    console.error("[ai-usage] Failed to read balance storage:", err);
     return { snapshots: [] };
   }
 }
@@ -51,17 +52,23 @@ export async function fetchDeepSeekBalance(): Promise<BalanceSnapshot> {
 export function saveSnapshot(snapshot: BalanceSnapshot) {
   const storage = readStorage();
 
-  // Only save if it's a new date or balance changed significantly
+  // Skip if today already has a snapshot
   const today = storage.snapshots.filter((s) => s.date === snapshot.date);
+  if (today.length > 0) return;
 
-  if (today.length === 0) {
-    storage.snapshots.push(snapshot);
-    // Keep last 90 days
-    if (storage.snapshots.length > 90) {
-      storage.snapshots = storage.snapshots.slice(-90);
-    }
-    writeStorage(storage);
+  // Skip if balance hasn't changed since last snapshot (avoids unnecessary writes
+  // that trigger Turbopack HMR → infinite dashboard refresh loop)
+  const last = storage.snapshots[storage.snapshots.length - 1];
+  if (last && last.totalBalance === snapshot.totalBalance && last.toppedUp === snapshot.toppedUp) {
+    return;
   }
+
+  storage.snapshots.push(snapshot);
+  // Keep last 90 days
+  if (storage.snapshots.length > 90) {
+    storage.snapshots = storage.snapshots.slice(-90);
+  }
+  writeStorage(storage);
 }
 
 export function getCostStats() {

@@ -11,7 +11,8 @@ function isGitRepo(repoPath: string): boolean {
   try {
     execSync("git rev-parse --git-dir", { cwd: repoPath, stdio: "ignore" });
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[projects API] Failed to check git repo at", repoPath, ":", err);
     return false;
   }
 }

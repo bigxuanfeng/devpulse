@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
       ok: true,
       message: "Environment updated. Restart the dev server to apply changes.",
     });
-  } catch {
+  } catch (err) {
+    console.error("[env API] Failed to write .env.local:", err);
     return NextResponse.json(
       { error: "Failed to write .env.local" },
       { status: 500 }
