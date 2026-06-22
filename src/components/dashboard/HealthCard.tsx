@@ -3,6 +3,7 @@ interface HealthCardProps {
   lastCommit: string;
   todoCount: number;
   status: "active" | "stale" | "dead";
+  onClick?: () => void;
 }
 
 const STATUS_MAP: Record<HealthCardProps["status"], { label: string; color: string }> = {
@@ -11,11 +12,14 @@ const STATUS_MAP: Record<HealthCardProps["status"], { label: string; color: stri
   dead: { label: "已停止", color: "text-error" },
 };
 
-export function HealthCard({ name, lastCommit, todoCount, status }: HealthCardProps) {
+export function HealthCard({ name, lastCommit, todoCount, status, onClick }: HealthCardProps) {
   const s = STATUS_MAP[status];
 
   return (
-    <div className="bg-bg-surface rounded-md p-4 shadow-card border border-border-default">
+    <div
+      onClick={onClick}
+      className={`bg-bg-surface rounded-md p-4 shadow-card border border-border-default ${onClick ? "cursor-pointer hover:border-accent hover:shadow-elevated transition-all duration-200" : ""}`}
+    >
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-medium text-text-primary">{name}</h3>
         <span className={`text-xs ${s.color}`}>{s.label}</span>

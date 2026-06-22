@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { HealthCard } from "@/components/dashboard/HealthCard";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { CostTrend } from "@/components/dashboard/CostTrend";
+import { HourDistribution } from "@/components/dashboard/HourDistribution";
 import { Coins, GitCommit, Activity, Heart } from "lucide-react";
 import type { DashboardData } from "@/lib/data/types";
 
@@ -18,6 +20,7 @@ interface Summary {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,12 +108,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Chart Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <ChartCard title="代码活动热力图">
           <ActivityHeatmap dailyActivity={data.global?.dailyActivity ?? []} />
         </ChartCard>
         <ChartCard title="AI 成本趋势">
           <CostTrend dailyCosts={data.aiUsage?.dailyCosts ?? []} />
+        </ChartCard>
+        <ChartCard title="编码时间分布">
+          <HourDistribution dailyActivity={data.global?.dailyActivity ?? []} />
         </ChartCard>
       </div>
 
@@ -127,6 +133,7 @@ export default function DashboardPage() {
             }
             todoCount={project.todoCount}
             status={project.status}
+            onClick={() => router.push(`/projects/${project.projectName}`)}
           />
         ))}
         {data.gitStats.length < 2 && (
