@@ -4,16 +4,38 @@ import { useEffect } from 'react';
 
 export function SWRegistration() {
   useEffect(() => {
-    // 只在生产环境注册 Service Worker
-    // 开发环境下 SW 会拦截 HMR 请求，导致页面无限刷新
-    if (process.env.NODE_ENV !== 'production') {
-      return;
-    }
-
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return;
     }
 
+    // 开发环境：主动注销所有已注册的 Service Worker
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => {
+          if (registrations.length > 0) {
+            console.log(`[SW] 开发环境：注销 ${registrations.length} 个旧 Service Worker`);
+            registrations.forEach((registration) => {
+              registration.unregister();
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('[SW] 注销失败:', error);
+        });
+
+      // 同时清除所有缓存
+      if ('caches' in window) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+          });
+        });
+      }
+      return;
+    }
+
+    // 生产环境：注册 Service Worker
     const registerSW = () => {
       navigator.serviceWorker
         .register('/sw.js')
