@@ -27,6 +27,51 @@ export default function SettingsPage() {
   const [addSuccess, setAddSuccess] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [apiKeySaved, setApiKeySaved] = useState(false);
+  const [balanceData, setBalanceData] = useState<{
+    currentBalance: number;
+    totalCost: number;
+    costThisMonth: number;
+  } | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState("");
+
+  const fetchBalance = () => {
+    setBalanceLoading(true);
+    setBalanceError("");
+    fetch("/api/ai-balance")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setBalanceData(data.data);
+        } else {
+          setBalanceError(data.error || "获取余额失败");
+        }
+        setBalanceLoading(false);
+      })
+      .catch(() => {
+        setBalanceError("获取余额失败");
+        setBalanceLoading(false);
+      });
+  };
+
+  const handleRefreshBalance = () => {
+    setBalanceLoading(true);
+    setBalanceError("");
+    fetch("/api/ai-balance", { method: "POST" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setBalanceData(data.data.stats);
+        } else {
+          setBalanceError(data.error || "更新余额失败");
+        }
+        setBalanceLoading(false);
+      })
+      .catch(() => {
+        setBalanceError("更新余额失败");
+        setBalanceLoading(false);
+      });
+  };
 
   const fetchProjects = () => {
     fetch("/api/projects")
@@ -40,6 +85,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchProjects();
+    fetchBalance();
     fetch("/api/dashboard")
       .then((r) => r.json())
       .then(() => {})
@@ -266,6 +312,64 @@ export default function SettingsPage() {
           <p className="text-xs text-text-muted mt-2">
             Key 保存在 .env.local 文件中，不会上传到 Git
           </p>
+        </div>
+      </section>
+
+      {/* AI 余额管理 */}
+      <section className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Key size={18} className="text-text-secondary" />
+          <h2 className="text-lg font-medium text-text-primary">AI 余额管理</h2>
+        </div>
+
+        <div className="bg-bg-surface rounded-md shadow-card border border-border-default p-4">
+          <p className="text-sm text-text-secondary mb-3">
+            查看 DeepSeek API 余额和 AI 使用成本统计。
+          </p>
+
+          {balanceError && (
+            <div className="mb-3 text-xs text-error">{balanceError}</div>
+          )}
+
+          {balanceLoading ? (
+            <div className="text-sm text-text-muted">加载中...</div>
+          ) : balanceData ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-bg-root rounded-md p-3 text-center">
+                  <div className="text-2xl font-semibold text-accent font-[family-name:var(--font-data)]">
+                    ¥{balanceData.currentBalance.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-text-muted mt-1">当前余额</div>
+                </div>
+                <div className="bg-bg-root rounded-md p-3 text-center">
+                  <div className="text-2xl font-semibold text-text-primary font-[family-name:var(--font-data)]">
+                    ¥{balanceData.costThisMonth.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-text-muted mt-1">本月花费</div>
+                </div>
+                <div className="bg-bg-root rounded-md p-3 text-center">
+                  <div className="text-2xl font-semibold text-text-primary font-[family-name:var(--font-data)]">
+                    ¥{balanceData.totalCost.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-text-muted mt-1">总成本</div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleRefreshBalance}
+                disabled={balanceLoading}
+                className="flex items-center gap-1.5 px-4 py-2 bg-bg-hover text-text-primary border border-border-default rounded-sm text-sm font-medium transition-colors duration-150 hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Download size={14} />
+                更新余额
+              </button>
+            </div>
+          ) : (
+            <div className="text-sm text-text-muted">
+              暂无余额数据。请点击"更新余额"获取。
+            </div>
+          )}
         </div>
       </section>
 
