@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { ThemeInit } from "@/components/layout/ThemeInit";
-import { SWRegistration } from "@/components/SWRegistration";
 
 export const metadata: Metadata = {
   title: "DevPulse - 开发者效能面板",
@@ -18,7 +17,6 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-bg-root text-text-primary">
         <ThemeInit />
-        <SWRegistration />
         <Navbar />
         <main className="flex-1">{children}</main>
       </body>
