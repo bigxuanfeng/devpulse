@@ -150,8 +150,8 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
       <div
         ref={expandedRef}
         className={`
-          overflow-hidden transition-all duration-300 ease-standard
-          ${isExpanded ? "max-h-[1600px] opacity-100" : "max-h-0 opacity-0"}
+          transition-all duration-300 ease-standard
+          ${isExpanded ? "max-h-[calc(100vh-8rem)] overflow-y-auto opacity-100" : "max-h-0 overflow-hidden opacity-0"}
         `}
       >
         <div className="border-t border-border-default" />
@@ -165,11 +165,11 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="输入标题..."
-                className="text-lg font-medium text-text-primary bg-transparent outline-none placeholder:text-text-muted w-full"
+                className="text-lg font-medium text-text-primary bg-transparent outline-none placeholder:text-text-muted w-full min-w-0"
                 autoFocus
               />
             ) : (
-              <span className="text-lg font-medium text-text-primary">{entry.title || entry.date}</span>
+              <span className="min-w-0 break-words text-lg font-medium text-text-primary">{entry.title || entry.date}</span>
             )}
             <button onClick={onClose} className="text-text-muted hover:text-text-secondary transition-colors duration-150 shrink-0 ml-2">
               <X size={18} />
@@ -205,7 +205,7 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
               className="w-full min-h-[400px] bg-transparent text-base text-text-primary font-[family-name:var(--font-editor)] resize-y outline-none placeholder:text-text-muted"
             />
           ) : (
-            <div className="min-h-[200px] text-base text-text-primary font-[family-name:var(--font-editor)] whitespace-pre-wrap">
+            <div className="min-h-[200px] text-base text-text-primary font-[family-name:var(--font-editor)] whitespace-pre-wrap [overflow-wrap:anywhere]">
               {entry.content || <span className="text-text-muted">暂无内容</span>}
             </div>
           )}
@@ -290,18 +290,23 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border-default">
-          <div className="flex items-center gap-3">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          className="sticky bottom-0 z-10 flex items-center justify-between gap-3 px-4 py-3 border-t border-border-default bg-bg-surface"
+        >
+          <div className="min-w-0 flex items-center gap-3">
             {isEditing && (
               <button onClick={handleCopyReport} className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors duration-150">
                 <Copy size={12} />复制为周报
               </button>
             )}
             {showDeleteConfirm ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-error">确认删除？</span>
-                <button onClick={handleDelete} className="text-xs px-2 py-0.5 bg-error text-white rounded-sm transition-colors duration-150 hover:opacity-80">删除</button>
-                <button onClick={() => setShowDeleteConfirm(false)} className="text-xs text-text-muted hover:text-text-secondary transition-colors duration-150">取消</button>
+              <div className="min-w-0 flex items-center gap-2">
+                <span className="truncate text-xs text-error">确认删除？</span>
+                <button onClick={handleDelete} className="shrink-0 text-xs px-2 py-0.5 bg-error text-white rounded-sm transition-colors duration-150 hover:opacity-80">删除</button>
+                <button onClick={() => setShowDeleteConfirm(false)} className="shrink-0 text-xs text-text-muted hover:text-text-secondary transition-colors duration-150">取消</button>
               </div>
             ) : (
               <button onClick={() => setShowDeleteConfirm(true)} className="flex items-center gap-1 text-xs text-text-muted hover:text-error transition-colors duration-150">
@@ -311,13 +316,13 @@ export function ExpandableDiaryCard({ entry, isExpanded, searchQuery, onClick, o
           </div>
 
           {isEditing ? (
-            <button onClick={handleSave} disabled={!content.trim()} className="px-4 py-1.5 bg-accent text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed">
+            <button onClick={handleSave} disabled={!content.trim()} className="shrink-0 px-4 py-1.5 bg-accent text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed">
               保存
             </button>
           ) : (
             <button
               onClick={handleStartEdit}
-              className="px-4 py-1.5 bg-accent text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-accent-hover"
+              className="shrink-0 px-4 py-1.5 bg-accent text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-accent-hover"
             >
               编辑
             </button>
